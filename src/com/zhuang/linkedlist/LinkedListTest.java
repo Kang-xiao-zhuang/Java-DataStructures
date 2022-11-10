@@ -4,6 +4,7 @@ import com.zhuang.sqlist.User;
 
 public class LinkedListTest {
 	public static void main(String[] args) {
+		test02();
 		test03();
 	}
 
@@ -44,7 +45,7 @@ public class LinkedListTest {
 	public static void test03() {
 		MyLinkedList<User> userList = new MyLinkedList<>();
 		System.out.println("添加User");
-		for (int i = 0; i < 10; i++) {
+		for (int i = 1; i <= 3; i++) {
 			userList.add(new User(i, i + "号"));
 		}
 		System.out.println(userList);

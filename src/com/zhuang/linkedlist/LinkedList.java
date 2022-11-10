@@ -1,6 +1,13 @@
 package com.zhuang.linkedlist;
 
 @SuppressWarnings("all")
+/**
+ * 
+ * @ClassName: LinkedList
+ * @Description:LinkedList代码
+ * @author: KangXiaoZhuang
+ * @date: 2022年11月10日 下午8:41:20
+ */
 public class LinkedList<E> implements List<E> {
 
 	transient int size = 0;
@@ -24,7 +31,7 @@ public class LinkedList<E> implements List<E> {
 	public void linkFirst(E e) {
 		// 定义temp节点
 		final Node<E> temp = first;
-		// 定义新的节点 没有前驱，后继就是head
+		// 定义新的节点 没有前驱，后继就是first
 		final Node<E> newNode = new Node<>(null, e, temp);
 		// 新的节点直接成为first
 		first = newNode;

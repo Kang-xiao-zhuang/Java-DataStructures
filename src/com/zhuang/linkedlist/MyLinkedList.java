@@ -1,14 +1,18 @@
 package com.zhuang.linkedlist;
 
+/**
+ * 
+ * @ClassName: MyLinkedList
+ * @Description:TODO 另一种方法实现链表
+ * @author: KangXiaoZhuang
+ * @date: 2022年11月10日 下午9:29:35
+ */
 public class MyLinkedList<E> implements MyList<E> {
 
 	// 找不到值为-1
 	public static final int ELEMENT_NOT_FOUND = -1;
 	// 链表大小
 	private int size;
-
-	// 修改次数
-	private int modCount = 0;
 
 	// 头节点
 	private Node<E> beginMarker;
@@ -33,8 +37,6 @@ public class MyLinkedList<E> implements MyList<E> {
 		// endMarker.prev = beginMarker;
 		// 大小
 		size = 0;
-		// 修改次数加1
-		modCount++;
 	}
 
 	@Override
@@ -137,7 +139,6 @@ public class MyLinkedList<E> implements MyList<E> {
 		newNode.prev.next = newNode;
 		node.prev = newNode;
 		size++;
-		modCount++;
 	}
 
 	/**
@@ -155,7 +156,6 @@ public class MyLinkedList<E> implements MyList<E> {
 		// 节点的后继 指向 节点的前驱的后继
 		node.prev.next = node.next;
 		size--;
-		modCount++;
 		return node.data;
 	}
 
