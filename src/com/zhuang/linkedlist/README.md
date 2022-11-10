@@ -41,23 +41,511 @@
 
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/39938e13143e4578a61ad271f9b8f44a.png)
 
-## LinkedList类的实现
+## LinkedList类的实现重要方法
+
+**List接口**
+
+```java
+public interface List<E> {
+	boolean add(E e);
+
+	boolean addFirst(E e);
+
+	boolean addLast(E e);
+
+	boolean remove(Object o);
+
+	E get(int index);
+
+	void printLinkList();
+}
+```
+
+### 头插节点
+
+头插的操作流程
+
+- 先把头节点记录下来`temp`，之后创建一个新的节点。新的节点构造函数的头节点入参为`null`，构建出一个新的节点
+
+- 原来的头节点，设置`first.prev`连接到新的头节点，完成头插的操作
+- 如果原来就没有头节点，头节点设置新的节点即可。
+- 最后记录当前链表中节点的数量
+
+![在这里插入图片描述](https://img-blog.csdnimg.cn/1aad84fd8d5a413d9a910ad1681689d5.png)
+
+```java
+/**
+	 * 
+	 * @Title: linkFirst
+	 * @Description: 头插节点
+	 * @param: @param e
+	 * @author: KangXiaoZhuang
+	 * @email: ITkxz0830@163.com
+	 */
+	public void linkFirst(E e) {
+		// 定义temp节点
+		final Node<E> temp = first;
+		// 定义新的节点 没有前驱，后继就是first
+		final Node<E> newNode = new Node<>(null, e, temp);
+		// 新的节点直接成为first
+		first = newNode;
+		if (temp == null) {
+			last = newNode;
+		} else {
+			temp.prev = newNode;
+		}
+		size++;
+	}
+```
+
+### 尾插节点
+
+- 记录当前的尾节点`tempLast`，创建新的节点，并把当前的尾节点，通过`tempLast.next = newNode`关联到新创建的节点上。
+- 记录``size`节点数量值
+
+![在这里插入图片描述](https://img-blog.csdnimg.cn/fbed93e273864388b6ff4f77e7e9b034.png)
+
+
+
+```java
+/**
+	 * 
+	 * @Title: linkLast
+	 * @Description: 尾插节点
+	 * @param: @param e
+	 * @author: KangXiaoZhuang
+	 * @email: ITkxz0830@163.com
+	 */
+	public void linkLast(E e) {
+		final Node<E> tempLast = last;
+		// 只有前驱，没有后继
+		final Node<E> newNode = new Node<>(tempLast, e, null);
+		// 最后的节点就是新的节点
+		last = newNode;
+		if (tempLast == null) {
+			first = newNode;
+		} else {
+			tempLast.next = newNode;
+		}
+		size++;
+	}
+```
+
+### 拆链操作
+
+
+
+![在这里插入图片描述](https://img-blog.csdnimg.cn/873e778bbf3a4a49980ed035fc671b41.png)
+
+
+
+```java
+/**
+	 * 
+	 * @Title: unlink
+	 * @Description: 拆链操作
+	 * @param: @param  node
+	 * @param: @return
+	 * @author: KangXiaoZhuang
+	 * @email: ITkxz0830@163.com
+	 */
+	public E unlink(Node<E> node) {
+		E element = node.data;
+		// 后继
+		Node<E> next = node.next;
+		// 前驱
+		Node<E> prev = node.prev;
+		// 没有前驱节点,代表node节点在头部
+		if (prev == null) {
+			// next直接成为first
+			first = next;
+		} else {
+			// 1 2 3 4
+			// 将node节点的后继前移
+			prev.next = next;
+			// node节点的前驱置为空
+			node.prev = null;
+		}
+		// 没有后继节点,代表node节点在尾部
+		if (next == null) {
+			// node的前驱直接是最后
+			last = prev;
+		} else {
+			// 1 2 3 4
+			// 将node节点的前驱后移
+			next.prev = prev;
+			// node节点的后继置为空
+			node.next = null;
+		}
+		// 值置为空
+		node.data = null;
+		// 长度自减
+		size--;
+		return element;
+	}
+```
+
+### 删除节点
+
+- 删除元素需要循环比较元素的值，进行删除
+- 比对的过程的复杂度O(n)
+- 删除的过程复杂度O(1)
+
+```java
+public boolean remove(Object o) {
+		if (o == null) {
+			// 遍历
+			Node<E> node = first;
+			while (node != null) {
+				if (node.data == null) {
+					unlink(node);
+					return true;
+				}
+				node = node.next;
+			}
+		} else {
+			// 遍历
+			Node<E> node = first;
+			while (node != null) {
+				if (o.equals(node.data)) {
+					unlink(node);
+					return true;
+				}
+				node = node.next;
+			}
+		}
+		return false;
+	}
+```
+
+**LinkedList完整代码**
+
+```java
+@SuppressWarnings("all")
+/**
+ * 
+ * @ClassName: LinkedList
+ * @Description:LinkedList代码
+ * @author: KangXiaoZhuang
+ * @date: 2022年11月10日 下午8:41:20
+ */
+public class LinkedList<E> implements List<E> {
+
+	transient int size = 0;
+
+	transient Node<E> first;
+
+	transient Node<E> last;
+
+	public LinkedList() {
+
+	}
+
+	/**
+	 * 
+	 * @Title: linkFirst
+	 * @Description: 头插节点
+	 * @param: @param e
+	 * @author: KangXiaoZhuang
+	 * @email: ITkxz0830@163.com
+	 */
+	public void linkFirst(E e) {
+		// 定义temp节点
+		final Node<E> temp = first;
+		// 定义新的节点 没有前驱，后继就是first
+		final Node<E> newNode = new Node<>(null, e, temp);
+		// 新的节点直接成为first
+		first = newNode;
+		if (temp == null) {
+			last = newNode;
+		} else {
+			temp.prev = newNode;
+		}
+		size++;
+	}
+
+	/**
+	 * 
+	 * @Title: linkLast
+	 * @Description: 尾插节点
+	 * @param: @param e
+	 * @author: KangXiaoZhuang
+	 * @email: ITkxz0830@163.com
+	 */
+	public void linkLast(E e) {
+		final Node<E> tempLast = last;
+		// 只有前驱，没有后继
+		final Node<E> newNode = new Node<>(tempLast, e, null);
+		// 最后的节点就是新的节点
+		last = newNode;
+		if (tempLast == null) {
+			first = newNode;
+		} else {
+			tempLast.next = newNode;
+		}
+		size++;
+	}
+
+	/**
+	 * 
+	 * @Title: unlink
+	 * @Description: 拆链操作
+	 * @param: @param  node
+	 * @param: @return
+	 * @author: KangXiaoZhuang
+	 * @email: ITkxz0830@163.com
+	 */
+	public E unlink(Node<E> node) {
+		E element = node.data;
+		// 后继
+		Node<E> next = node.next;
+		// 前驱
+		Node<E> prev = node.prev;
+		// 没有前驱节点,代表node节点在头部
+		if (prev == null) {
+			// next直接成为first
+			first = next;
+		} else {
+			// 1 2 3 4
+			// 将node节点的后继前移
+			prev.next = next;
+			// node节点的前驱置为空
+			node.prev = null;
+		}
+		// 没有后继节点,代表node节点在尾部
+		if (next == null) {
+			// node的前驱直接是最后
+			last = prev;
+		} else {
+			// 1 2 3 4
+			// 将node节点的前驱后移
+			next.prev = prev;
+			// node节点的后继置为空
+			node.next = null;
+		}
+		// 值置为空
+		node.data = null;
+		// 长度自减
+		size--;
+		return element;
+	}
+
+	@Override
+	public boolean add(E e) {
+		linkLast(e);
+		return true;
+	}
+
+	@Override
+	public boolean addFirst(E e) {
+		linkFirst(e);
+		return true;
+	}
+
+	@Override
+	public boolean addLast(E e) {
+		linkLast(e);
+		return true;
+	}
+
+	@Override
+	public boolean remove(Object o) {
+		if (o == null) {
+			// 遍历
+			Node<E> node = first;
+			while (node != null) {
+				if (node.data == null) {
+					unlink(node);
+					return true;
+				}
+				node = node.next;
+			}
+		} else {
+			// 遍历
+			Node<E> node = first;
+			while (node != null) {
+				if (o.equals(node.data)) {
+					unlink(node);
+					return true;
+				}
+				node = node.next;
+			}
+		}
+		return false;
+	}
+
+	@Override
+	public E get(int index) {
+		return node(index).data;
+	}
+
+	@Override
+	public void printLinkList() {
+		if (this.size == 0) {
+			System.out.println("链表为空");
+		} else {
+			Node<E> temp = first;
+			System.out.print("目前的列表，头节点：" + first.data + " 尾节点：" + last.data + " \n整体：");
+			while (temp != null) {
+				System.out.print(temp.data + "，");
+				temp = temp.next;
+			}
+			System.out.println();
+		}
+	}
+
+	/**
+	 * 
+	 * @Title: node
+	 * @Description: 找到指定索引的节点
+	 * @param: @param  index
+	 * @param: @return
+	 * @author: KangXiaoZhuang
+	 * @email: ITkxz0830@163.com
+	 */
+	public Node<E> node(int index) {
+		/*
+		 * Node<E> node = first; for (int i = 0; i < index; i++) { node = node.next; }
+		 */
+		// 可以使用折半优化下
+		if (index < (size >> 1)) {
+			// 从头找
+			Node node = first;
+			for (int i = 0; i < index; i++) {
+				node = node.next;
+			}
+			return node;
+		} else {
+			// 从尾找
+			Node node = last;
+			for (int i = size - 1; i > index; i--) {
+				node = node.next;
+			}
+			return node;
+		}
+	}
+
+	private static class Node<E> {
+		E data;
+		Node<E> next;
+		Node<E> prev;
+
+		public Node(Node<E> prev, E element, Node<E> next) {
+			this.data = element;
+			this.next = next;
+			this.prev = prev;
+		}
+	}
+}
+```
+
+**测试**
+
+```java
+public class LinkedListTest {
+	public static void main(String[] args) {
+		test01();
+	}
+
+	public static void test01() {
+		List<String> list = new LinkedList<>();
+		// 添加元素
+		list.add("a");
+		list.addFirst("b");
+		list.addLast("c");
+		list.printLinkList();
+		// 头插元素
+		list.addFirst("d");
+		// 删除元素
+		list.remove("b");
+		// 打印列表
+		list.printLinkList();
+	}
+}
+```
+
+![在这里插入图片描述](https://img-blog.csdnimg.cn/642cb016ee32434cbe6469bb2d2a77cc.png)
+
+## 另一种实现方法
+
+**MyList接口**
+
+```java
+public interface MyList<E> {
+	void clear();
+
+	int size();
+
+	boolean isEmpty();
+
+	E get(int index);
+
+	E set(int index, E newElement);
+
+	boolean add(E addElement);
+
+	void add(int index, E addElement);
+
+	E remove(int index);
+}
+```
 
 考虑设计方面，提供几个类
 
 1. LinkedList类本身，包含两端的链，表的大小以及一些方法
 2. Node类，私有的嵌套类，一个节点包含数据以及前一个节点的链和到下一个节点的类，适当的构造方法
 
+## 查找的优化
+
+这里查找元素可以使用二分，距离头近就从头开始找，距离尾近就从尾开始找，缩小搜索的时间
+
 ```java
+/**
+	 * 
+	 * @Title: getNode
+	 * @Description: 根据索引获取节点(二分查找，速度更快)
+	 * @param: @param  index 索引
+	 * @param: @return Node
+	 * @author: KangXiaoZhuang
+	 * @email: ITkxz0830@163.com
+	 */
+	private Node<E> getNode(int index) {
+		Node<E> node = null;
+		rangeCheck(index);
+		// 折半查找
+		// 距离头近
+		if (index < size() >> 1) {
+			node = beginMarker.next;
+			for (int i = 0; i < index; i++) {
+				node = node.next;
+			}
+			// 距离尾近
+		} else {
+			node = endMarker;
+			for (int i = size(); i > index; i--) {
+				node = node.prev;
+			}
+		}
+		return node;
+	}
+```
+
+**MyLinkedList完整代码**
+
+```java
+/**
+ * 
+ * @ClassName: MyLinkedList
+ * @Description:TODO 另一种方法实现链表
+ * @author: KangXiaoZhuang
+ * @date: 2022年11月10日 下午9:29:35
+ */
 public class MyLinkedList<E> implements MyList<E> {
 
 	// 找不到值为-1
 	public static final int ELEMENT_NOT_FOUND = -1;
 	// 链表大小
 	private int size;
-
-	// 修改次数
-	private int modCount = 0;
 
 	// 头节点
 	private Node<E> beginMarker;
@@ -82,8 +570,6 @@ public class MyLinkedList<E> implements MyList<E> {
 		// endMarker.prev = beginMarker;
 		// 大小
 		size = 0;
-		// 修改次数加1
-		modCount++;
 	}
 
 	@Override
@@ -186,7 +672,6 @@ public class MyLinkedList<E> implements MyList<E> {
 		newNode.prev.next = newNode;
 		node.prev = newNode;
 		size++;
-		modCount++;
 	}
 
 	/**
@@ -204,7 +689,6 @@ public class MyLinkedList<E> implements MyList<E> {
 		// 节点的后继 指向 节点的前驱的后继
 		node.prev.next = node.next;
 		size--;
-		modCount++;
 		return node.data;
 	}
 
@@ -251,3 +735,89 @@ public class MyLinkedList<E> implements MyList<E> {
 }
 ```
 
+```java
+public class User {
+	private int id;
+	private String name;
+
+	public User() {
+
+	}
+
+	public User(int id, String name) {
+		super();
+		this.id = id;
+		this.name = name;
+	}
+
+	@Override
+	public String toString() {
+		return "User [id=" + id + ", name=" + name + "]";
+	}
+
+}
+```
+
+**测试**
+
+```java
+public class LinkedListTest {
+	public static void main(String[] args) {
+		test02();
+		test03();
+	}
+	public static void test02() {
+		MyLinkedList<Integer> myLinkedList = new MyLinkedList<>();
+		myLinkedList.add(0);
+		myLinkedList.add(2);
+		myLinkedList.add(3);
+		myLinkedList.add(4);
+		myLinkedList.add(5);
+		myLinkedList.add(6);
+		System.out.println(myLinkedList);
+		myLinkedList.remove(1);
+		System.out.println(myLinkedList);
+		myLinkedList.set(1, 66);
+		System.out.println(myLinkedList);
+		myLinkedList.add(4, 888);
+		System.out.println(myLinkedList);
+		myLinkedList.clear();
+		System.out.println(myLinkedList);
+	}
+
+	public static void test03() {
+		MyLinkedList<User> userList = new MyLinkedList<>();
+		System.out.println("添加User");
+		for (int i = 1; i <= 3; i++) {
+			userList.add(new User(i, i + "号"));
+		}
+		System.out.println(userList);
+		userList.remove(1);
+		System.out.println(userList);
+	}
+}
+```
+
+![在这里插入图片描述](https://img-blog.csdnimg.cn/2329c33cb1f54d71b9c888be923bb72a.png)
+
+## 常见面试题
+
+- 描述一下链表的数据结构？
+
+> 链表是一种物理[存储单元](https://baike.baidu.com/item/存储单元/8727749?fromModule=lemma_inlink)上非连续、非顺序的[存储结构](https://baike.baidu.com/item/存储结构/350782?fromModule=lemma_inlink)，[数据元素](https://baike.baidu.com/item/数据元素/715313?fromModule=lemma_inlink)的逻辑顺序是通过链表中的[指针](https://baike.baidu.com/item/指针/2878304?fromModule=lemma_inlink)链接次序实现的。链表由一系列结点（链表中每一个元素称为结点）组成，结点可以在运行时动态生成。每个结点包括两个部分：一个是存储[数据元素](https://baike.baidu.com/item/数据元素?fromModule=lemma_inlink)的数据域，另一个是存储下一个结点地址的[指针](https://baike.baidu.com/item/指针/2878304?fromModule=lemma_inlink)域。 相比于[线性表](https://baike.baidu.com/item/线性表/3228081?fromModule=lemma_inlink)[顺序结构](https://baike.baidu.com/item/顺序结构/9845234?fromModule=lemma_inlink)，操作复杂。由于不必须按顺序存储，链表在插入的时候可以达到O(1)的复杂度，比另一种线性表顺序表快得多，但是查找一个节点或者访问特定编号的节点则需要O(n)的时间，而线性表和顺序表相应的时间复杂度分别是O(logn)和O(1)
+
+- Java 中LinkedList 使用的是单向链表、双向链表还是循环链表？
+
+> 双向链表
+
+- 链表中数据的插入、删除、获取元素，时间复杂度是多少？
+
+> 插入 O(1)
+>
+> 删除 O(1)
+>
+> 获取 O(n)
+
+- 什么场景下使用链表更合适？
+
+> 对线性表的长度或者规模难以估计；频繁做插入删除操作；构建动态性比较强的线性表
