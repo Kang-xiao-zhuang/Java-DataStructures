@@ -8,7 +8,7 @@ import java.util.Arrays;
 /**
  * 
  * @ClassName: MyStack3
- * @Description:中缀表达式转换成后缀表达式的Java代码
+ * @Description:后缀表达式求值Java代码
  * @author: KangXiaoZhuang
  * @date: 2022年11月9日 下午10:10:19
  */
@@ -95,8 +95,10 @@ class ParsePost {
 			ch = input.charAt(j);
 			myStack3.displayStack("" + ch + " ");
 			if (ch >= '0' && ch <= '9') {
+				// 数字就入栈
 				myStack3.push((int) (ch - '0'));
 			} else {
+				// 运算符就计算弹出栈的两个值
 				num2 = myStack3.pop();
 				num1 = myStack3.pop();
 				switch (ch) {
@@ -127,6 +129,7 @@ class ParsePost {
 
 class PostfixApp {
 	public static void main(String[] args) throws IOException {
+		// 345+*612+/-
 		String input;
 		int output;
 		while (true) {
@@ -134,6 +137,7 @@ class PostfixApp {
 			System.out.flush();
 			input = getString();
 			if (input.equals("")) {
+				System.out.println("程序结束!");
 				break;
 			}
 			ParsePost aParser = new ParsePost(input);

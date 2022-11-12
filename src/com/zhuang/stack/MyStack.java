@@ -29,11 +29,18 @@ public class MyStack<E> implements Deque<E> {
 
 	@Override
 	public void push(E e) {
+		// 判断栈是否满
+		if (isFull()) {
+			throw new ArrayIndexOutOfBoundsException("栈满！不能添加元素");
+		}
 		stackArray[++top] = e;
 	}
 
 	@Override
 	public E pop() {
+		if (top==-1) {
+			throw new NullPointerException("栈空！不能弹出元素");
+		}
 		return stackArray[top--];
 	}
 
@@ -50,6 +57,26 @@ public class MyStack<E> implements Deque<E> {
 	@Override
 	public boolean isFull() {
 		return top == maxSize - 1;
+	}
+
+	@Override
+	public int size() {
+		return maxSize;
+	}
+
+	@Override
+	public MyStack<E> clearStack(MyStack<E> myStack) {
+		for (int i = 0; i < myStack.stackArray.length; i++) {
+			myStack.stackArray[i] = null;
+		}
+		return myStack;
+	}
+
+	@Override
+	public boolean destoryStack(MyStack<E> myStack) {
+		myStack.maxSize = 0;
+		myStack.stackArray = null;
+		return true;
 	}
 
 	@Override

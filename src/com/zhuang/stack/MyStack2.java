@@ -94,6 +94,7 @@ class InToPost {
 		for (int j = 0; j < input.length(); j++) {
 			char ch = input.charAt(j);
 			myStack2.displayStack("For " + ch + " ");
+			// 对运算符进行操作
 			switch (ch) {
 			case '+':
 			case '-':
@@ -160,12 +161,14 @@ class InToPost {
 
 class InfixApp {
 	public static void main(String[] args) throws IOException {
+		// A*(B+C)-D/(E+F)
 		String input, output;
 		while (true) {
 			System.out.print("Enter infix: ");
 			System.out.flush();
 			input = getString();
 			if (input.equals("")) {
+				System.out.println("程序结束!");
 				break;
 			}
 			InToPost theTrans = new InToPost(input);

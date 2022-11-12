@@ -15,4 +15,13 @@ public interface Deque<E> {
 
 	// 判断是否栈满
 	boolean isFull();
+
+	// 返回栈的大小
+	int size();
+
+	// 清空栈元素
+	MyStack<E> clearStack(MyStack<E> myStack);
+
+	// 销毁栈
+	boolean destoryStack(MyStack<E> myStack);
 }
