@@ -821,3 +821,492 @@ public class LinkedListTest {
 - 什么场景下使用链表更合适？
 
 > 对线性表的长度或者规模难以估计；频繁做插入删除操作；构建动态性比较强的线性表
+
+## 链表相关题目
+
+[160. 相交链表 - 力扣（LeetCode）](https://leetcode.cn/problems/intersection-of-two-linked-lists/)
+
+```java
+/**
+ * Definition for singly-linked list.
+ * public class ListNode {
+ *     int val;
+ *     ListNode next;
+ *     ListNode(int x) {
+ *         val = x;
+ *         next = null;
+ *     }
+ * }
+ */
+public class Solution {
+    public ListNode getIntersectionNode(ListNode headA, ListNode headB) {
+       Set<ListNode> visited = new HashSet<ListNode>();
+		ListNode temp = headA;
+		while (temp != null) {
+			visited.add(temp);
+			temp = temp.next;
+		}
+		temp = headB;
+		while (temp != null) {
+			if (visited.contains(temp)) {
+				return temp;
+			}
+			temp = temp.next;
+		}
+		return null;
+    }
+}
+```
+
+[19. 删除链表的倒数第 N 个结点 - 力扣（LeetCode）](https://leetcode.cn/problems/remove-nth-node-from-end-of-list/)
+
+```java
+/**
+ * Definition for singly-linked list.
+ * public class ListNode {
+ *     int val;
+ *     ListNode next;
+ *     ListNode() {}
+ *     ListNode(int val) { this.val = val; }
+ *     ListNode(int val, ListNode next) { this.val = val; this.next = next; }
+ * }
+ */
+	// 栈方法
+	public ListNode removeNthFromEnd(ListNode head, int n) {
+		ListNode dummy = new ListNode(0, head);
+		LinkedList<ListNode> stack = new LinkedList<ListNode>();
+		ListNode cur = dummy;
+		while (cur != null) {
+			stack.push(cur);
+			cur = cur.next;
+		}
+		for (int i = 0; i < n; ++i) {
+			stack.pop();
+		}
+		ListNode prev = stack.peek();
+		prev.next = prev.next.next;
+		ListNode ans = dummy.next;
+		return ans;
+	}
+
+	// 双指针
+	public ListNode removeNthFromEnd2(ListNode head, int n) {
+		ListNode pre = new ListNode(0, head);
+		ListNode slow = pre;
+		ListNode fast = head;
+		while (n-- > 0 && fast != null) {
+			fast = fast.next;
+		}
+		while (fast != null) {
+			fast = fast.next;
+			slow = slow.next;
+		}
+		slow.next = slow.next.next;
+		return pre.next;
+	}
+
+	// 计算链表长度
+	public ListNode removeNthFromEnd3(ListNode head, int n) {
+		ListNode dummy = new ListNode(0, head);
+		int length = getLength(head);
+		ListNode cur = dummy;
+		for (int i = 1; i < length - n + 1; ++i) {
+			cur = cur.next;
+		}
+		cur.next = cur.next.next;
+		ListNode ans = dummy.next;
+		return ans;
+	}
+
+	public int getLength(ListNode head) {
+		int length = 0;
+		while (head != null) {
+			++length;
+			head = head.next;
+		}
+		return length;
+	}
+```
+
+[206. 反转链表 - 力扣（LeetCode）](https://leetcode.cn/problems/reverse-linked-list/)
+
+```java
+/**
+ * Definition for singly-linked list.
+ * public class ListNode {
+ *     int val;
+ *     ListNode next;
+ *     ListNode() {}
+ *     ListNode(int val) { this.val = val; }
+ *     ListNode(int val, ListNode next) { this.val = val; this.next = next; }
+ * }
+ */
+	public ListNode reverseList(ListNode head) {
+		ListNode newHead = null;
+		while (head != null) {
+			ListNode temp = head.next;
+			head.next = newHead;
+			newHead = head;
+			head = temp;
+		}
+		return newHead;
+	}
+	
+	 /**
+     * 以链表1->2->3->4->5举例
+     * @param head
+     * @return
+     */
+	public ListNode reverseList2(ListNode head) {
+        if (head == null || head.next == null) {
+            /*
+                直到当前节点的下一个节点为空时返回当前节点
+                由于5没有下一个节点了，所以此处返回节点5
+             */
+            return head;
+        }
+        //递归传入下一个节点，目的是为了到达最后一个节点
+        ListNode newHead = reverseList(head.next);
+                /*
+            第一轮出栈，head为5，head.next为空，返回5
+            第二轮出栈，head为4，head.next为5，执行head.next.next=head也就是5.next=4，
+                      把当前节点的子节点的子节点指向当前节点
+                      此时链表为1->2->3->4<->5，由于4与5互相指向，所以此处要断开4.next=null
+                      此时链表为1->2->3->4<-5
+                      返回节点5
+            第三轮出栈，head为3，head.next为4，执行head.next.next=head也就是4.next=3，
+                      此时链表为1->2->3<->4<-5，由于3与4互相指向，所以此处要断开3.next=null
+                      此时链表为1->2->3<-4<-5
+                      返回节点5
+            第四轮出栈，head为2，head.next为3，执行head.next.next=head也就是3.next=2，
+                      此时链表为1->2<->3<-4<-5，由于2与3互相指向，所以此处要断开2.next=null
+                      此时链表为1->2<-3<-4<-5
+                      返回节点5
+            第五轮出栈，head为1，head.next为2，执行head.next.next=head也就是2.next=1，
+                      此时链表为1<->2<-3<-4<-5，由于1与2互相指向，所以此处要断开1.next=null
+                      此时链表为1<-2<-3<-4<-5
+                      返回节点5
+            出栈完成，最终头节点5->4->3->2->1
+         */
+        head.next.next = head;
+        head.next = null;
+        return newHead;
+    }
+	
+	public ListNode reverseList3(ListNode head) {
+        ListNode temp = null;
+        for (ListNode x = head; x != null; x = x.next) {
+        	temp = new ListNode(x.val,temp);
+        }
+        return temp;
+    }
+```
+
+[21. 合并两个有序链表 - 力扣（LeetCode）](https://leetcode.cn/problems/merge-two-sorted-lists/)
+
+```java
+/**
+ * Definition for singly-linked list.
+ * public class ListNode {
+ *     int val;
+ *     ListNode next;
+ *     ListNode() {}
+ *     ListNode(int val) { this.val = val; }
+ *     ListNode(int val, ListNode next) { this.val = val; this.next = next; }
+ * }
+ */
+	// 迭代
+	public ListNode mergeTwoLists(ListNode list1, ListNode list2) {
+		// 虚拟头节点
+		ListNode prehead = new ListNode(-1);
+		ListNode prev = prehead;
+		while (list1 != null && list2 != null) {
+			// 链表1节点值 小于 链表2节点值
+			if (list1.val <= list2.val) {
+				// 前驱节点移动
+				prev.next = list1;
+				// 向后移动
+				list1 = list1.next;
+			} else {
+				prev.next = list2;
+				list2 = list2.next;
+			}
+			prev = prev.next;
+		}
+		prev.next = list1 == null ? list2 : list1;
+		return prehead.next;
+	}
+
+	// 递归
+	public ListNode mergeTwoLists2(ListNode list1, ListNode list2) {
+		if (list1 == null) {
+			return list2;
+		} else if (list2 == null) {
+			return list1;
+		} else if (list1.val < list2.val) {
+			list1.next = mergeTwoLists(list1.next, list2);
+			return list1;
+		} else {
+			list2.next = mergeTwoLists(list1, list2.next);
+			return list2;
+		}
+	}
+```
+
+[234. 回文链表 - 力扣（LeetCode）](https://leetcode.cn/problems/palindrome-linked-list/)
+
+```java
+/**
+ * Definition for singly-linked list.
+ * public class ListNode {
+ *     int val;
+ *     ListNode next;
+ *     ListNode() {}
+ *     ListNode(int val) { this.val = val; }
+ *     ListNode(int val, ListNode next) { this.val = val; this.next = next; }
+ * }
+ */
+	// 校验
+	public boolean isPalindrome(ListNode head) {
+		ArrayList<Integer> list1 = new ArrayList<>();
+		ArrayList<Integer> list2 = new ArrayList<>();
+		ListNode cur = head;
+		while (cur != null) {
+			list1.add(cur.val);
+			list2.add(cur.val);
+			cur = cur.next;
+		}
+		Collections.reverse(list2);
+		return list1.equals(list2);
+	}
+
+	// 双指针
+	public boolean isPalindrome2(ListNode head) {
+		ArrayList<Integer> list = new ArrayList<>();
+		// 将链表的值复制到数组中
+		ListNode cur = head;
+		while (cur != null) {
+			list.add(cur.val);
+			cur = cur.next;
+		}
+
+		// 判断是否回文
+		int start = 0;
+		int end = list.size() - 1;
+		while (start < end) {
+			if (!list.get(start).equals(list.get(end))) {
+				return false;
+			}
+			start++;
+			end--;
+		}
+		return true;
+	}
+
+	// 栈
+	public boolean isPalindrome3(ListNode head) {
+		Stack<Integer> stack = new Stack<>();
+		for (ListNode cur = head; cur != null; cur = cur.next) {
+			stack.push(cur.val);
+		}
+		for (ListNode cur = head; cur != null; cur = cur.next) {
+			if (cur.val != stack.pop()) {
+				return false;
+			}
+		}
+		return true;
+	}
+```
+
+[24. 两两交换链表中的节点 - 力扣（LeetCode）](https://leetcode.cn/problems/swap-nodes-in-pairs/)
+
+```java
+/**
+ * Definition for singly-linked list.
+ * public class ListNode {
+ *     int val;
+ *     ListNode next;
+ *     ListNode() {}
+ *     ListNode(int val) { this.val = val; }
+ *     ListNode(int val, ListNode next) { this.val = val; this.next = next; }
+ * }
+ */
+	// 递归
+	public ListNode swapPairs(ListNode head) {
+		if (head == null || head.next == null) {
+			return head;
+		}
+		ListNode newHead = head.next;
+		head.next = swapPairs(newHead.next);
+		newHead.next = head;
+		return newHead;
+	}
+
+	// 迭代
+	public ListNode swapPairs2(ListNode head) {
+		ListNode dummy = new ListNode(0);
+		dummy.next = head;
+		ListNode temp = dummy;
+		while (temp.next != null && temp.next.next != null) {
+			ListNode node1 = temp.next;
+			ListNode node2 = temp.next.next;
+			temp.next = node2;
+			node1.next = node2.next;
+			node2.next = node1;
+			temp = node1;
+		}
+		return dummy.next;
+	}	
+```
+
+[328. 奇偶链表 - 力扣（LeetCode）](https://leetcode.cn/problems/odd-even-linked-list/)
+
+```java
+/**
+ * Definition for singly-linked list.
+ * public class ListNode {
+ *     int val;
+ *     ListNode next;
+ *     ListNode() {}
+ *     ListNode(int val) { this.val = val; }
+ *     ListNode(int val, ListNode next) { this.val = val; this.next = next; }
+ * }
+ */
+public ListNode oddEvenList(ListNode head) {
+		if (head == null) {
+			return head;
+		}
+		ListNode evenHead = head.next;
+		ListNode odd = head, even = evenHead;
+		while (even != null && even.next != null) {
+			odd.next = even.next;
+			odd = odd.next;
+			even.next = odd.next;
+			even = even.next;
+		}
+		odd.next = evenHead;
+		return head;
+	}
+```
+
+[445. 两数相加 II - 力扣（LeetCode）](https://leetcode.cn/problems/add-two-numbers-ii/)
+
+```java
+/**
+ * Definition for singly-linked list.
+ * public class ListNode {
+ *     int val;
+ *     ListNode next;
+ *     ListNode() {}
+ *     ListNode(int val) { this.val = val; }
+ *     ListNode(int val, ListNode next) { this.val = val; this.next = next; }
+ * }
+ */
+	// 栈
+	public ListNode addTwoNumbers(ListNode l1, ListNode l2) {
+		Stack<Integer> stack1 = new Stack<>();
+		Stack<Integer> stack2 = new Stack<>();
+		while (l1 != null) {
+			stack1.push(l1.val);
+			l1 = l1.next;
+		}
+
+		while (l2 != null) {
+			stack2.push(l2.val);
+			l2 = l2.next;
+		}
+		ListNode ans = null;
+		int carry = 0;
+		while (!stack1.isEmpty() || !stack2.isEmpty() || carry != 0) {
+			int a = stack1.isEmpty() ? 0 : stack1.pop();
+			int b = stack2.isEmpty() ? 0 : stack2.pop();
+			int cur = a + b + carry;
+			carry = cur / 10;
+			cur %= 10;
+			ListNode node = new ListNode(cur);
+			node.next = ans;
+			ans = node;
+		}
+		return ans;
+	}
+```
+
+[725. 分隔链表 - 力扣（LeetCode）](https://leetcode.cn/problems/split-linked-list-in-parts/)
+
+```java
+/**
+ * Definition for singly-linked list.
+ * public class ListNode {
+ *     int val;
+ *     ListNode next;
+ *     ListNode() {}
+ *     ListNode(int val) { this.val = val; }
+ *     ListNode(int val, ListNode next) { this.val = val; this.next = next; }
+ * }
+ */
+public ListNode[] splitListToParts(ListNode head, int k) {
+		int n = 0;
+		ListNode temp = head;
+		while (temp != null) {
+			n++;
+			temp = temp.next;
+		}
+		int quotient = n / k, remainder = n % k;
+
+		ListNode[] parts = new ListNode[k];
+		ListNode curr = head;
+		for (int i = 0; i < k && curr != null; i++) {
+			parts[i] = curr;
+			int partSize = quotient + (i < remainder ? 1 : 0);
+			for (int j = 1; j < partSize; j++) {
+				curr = curr.next;
+			}
+			ListNode next = curr.next;
+			curr.next = null;
+			curr = next;
+		}
+		return parts;
+	}
+```
+
+[83. 删除排序链表中的重复元素 - 力扣（LeetCode）](https://leetcode.cn/problems/remove-duplicates-from-sorted-list/)
+
+```java
+/**
+ * Definition for singly-linked list.
+ * public class ListNode {
+ *     int val;
+ *     ListNode next;
+ *     ListNode() {}
+ *     ListNode(int val) { this.val = val; }
+ *     ListNode(int val, ListNode next) { this.val = val; this.next = next; }
+ * }
+ */	
+	// 迭代
+	public ListNode deleteDuplicates(ListNode head) {
+		if (head == null || head.next == null) {
+			return head;
+		}
+		ListNode temp = head;
+		while (temp.next != null) {
+			// 比较后面的值是否相等
+			if (temp.val == temp.next.val) {
+				temp.next = temp.next.next;
+			} else {
+				temp = temp.next;
+			}
+		}
+		return head;
+	}
+	
+	// 递归
+	public ListNode deleteDuplicates2(ListNode head) {
+		if (head == null || head.next == null) {
+			return head;
+		}
+		head.next = deleteDuplicates2(head.next);
+		// 递归寻找后面节点的值是否相等，相等就返回head的后面，否则返回head
+		return head.val == head.next.val ? head.next : head;
+	}
+```
+

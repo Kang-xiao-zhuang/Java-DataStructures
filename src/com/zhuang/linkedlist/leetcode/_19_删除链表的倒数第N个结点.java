@@ -2,6 +2,13 @@ package com.zhuang.linkedlist.leetcode;
 
 import java.util.LinkedList;
 
+/**
+ * 
+ * @ClassName: _19_删除链表的倒数第N个结点
+ * @Description:https://leetcode.cn/problems/remove-nth-node-from-end-of-list/
+ * @author: KangXiaoZhuang
+ * @date: 2022年11月12日 下午9:07:22
+ */
 public class _19_删除链表的倒数第N个结点 {
 
 	// 栈方法
