@@ -14,6 +14,8 @@
 
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/1a3dd69c892744be8e2442e13e62177d.png)
 
+
+
 堆栈是一种==LIFO（后进先出）==的线性的数据结构，或者更抽象说是一种顺序集合，push 和pop 操作只发生在结构的一端，称为栈顶。这种结构可以很容易地从堆栈顶部取出一个项目，而要到达堆栈更深处的一个项目可能需要先取出多个其他项目。
 
 
@@ -140,7 +142,7 @@ public E pop() {
 
 
 
-# 实现堆栈结构
+## 实现堆栈结构
 
 我们平常使用不会直接使用Java 提供的Stack的，使用`ArrayDeque`替代，Deque 接口及其实现提供了一组更完整和一致的LIFO 堆栈操作，应优先使用此类。
 
@@ -888,3 +890,239 @@ class InfixApp {
 ```
 
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/4d5bf225c94e42e382da2c8027b4e3f7.png)
+
+## 常见面试题
+
+- 堆栈的使用场景？
+
+> 1.子程序的调用:在调往子程序前,会现将下个指令的地址存在堆栈中,直到子程序执行完后再将地址取出,以回到原来的程序中。
+>  2.处理递归调用:和子程序的调用类似,只是除了储存下一个指令的地址外,也将参数、区域变量等数据存入堆栈中。
+>  3.表达式的转换[中缀表达式转后缀表达式]与求值(实际解决)。
+>  4.二叉树的遍历。
+>  5.图形的深度优先(depth-first)搜索法
+
+- 为什么不是用Stack类？
+
+![在这里插入图片描述](https://img-blog.csdnimg.cn/9c70eda73c644a62be5da688e741c1ec.png)
+
+- ArrayDeque 是基于什么实现的？
+
+> - ArrayDeque是 Deque接口的一个实现，使用了可变数组，所以没有容量上的限制。同时， ArrayDeque是线程不安全的，在没有外部同步的情况下，不能在多线程环境下使用。
+> - ArrayDeque是 Deque的实现类，可以作为栈来使用，效率高于 Stack；也可以作为队列来使用，效率高于 LinkedList。
+> - ArrayDeque 是 Java 集合中双端队列的数组实现，双端队列的链表实现（LinkedList）
+> - 需要注意的是， ArrayDeque不支持 null值。
+
+- ArrayDeque 数据结构使用过程叙述
+
+> [一文详解 ArrayDeque 双端队列使用及实现原理](https://developer.aliyun.com/article/818484)
+
+- ArrayDeque 为什么要初始化2 的n 次幂个长度？
+
+> 速度上的优化有两点
+> 1.长度是2的n次幂是 取模阔以转换成按位与运算 效率更高
+> 2.扩容的时候 这样的长度设置更高效 扩展也总是2次幂的 这样的话 元素位置要么在原位 要么移动2次幂
+> 如果不是 则性能会差
+> 很容易发生碰撞 扩容的话需要移动很多
+
+## 栈相关题目
+
+[20. 有效的括号 - 力扣（LeetCode）](https://leetcode.cn/problems/valid-parentheses/)
+
+```java
+public boolean isValid(String s) {
+		Stack<Character> stack = new Stack<>();
+		for (char c : s.toCharArray()) {
+			if (c == '(') {
+				stack.push(')');
+			} else if (c == '[') {
+				stack.push(']');
+			} else if (c == '{') {
+				stack.push('}');
+			} else if (stack.isEmpty() || c != stack.pop()) {
+				return false;
+			}
+		}
+		return stack.isEmpty();
+	}
+```
+
+[225. 用队列实现栈 - 力扣（LeetCode）](https://leetcode.cn/problems/implement-stack-using-queues/)
+
+```java
+class MyStack {
+
+	Queue<Integer> queue;
+
+	public MyStack() {
+		queue = new LinkedList<Integer>();
+	}
+
+	public void push(int x) {
+		int n = queue.size();
+		queue.offer(x);
+		for (int i = 0; i < n; i++) {
+			queue.offer(queue.poll());
+		}
+	}
+
+	public int pop() {
+		return queue.poll();
+	}
+
+	public int top() {
+		return queue.peek();
+	}
+
+	public boolean empty() {
+		return queue.isEmpty();
+	}
+
+}
+
+/**
+ * Your MyStack object will be instantiated and called as such:
+ * MyStack obj = new MyStack();
+ * obj.push(x);
+ * int param_2 = obj.pop();
+ * int param_3 = obj.top();
+ * boolean param_4 = obj.empty();
+ */
+```
+
+[232. 用栈实现队列 - 力扣（LeetCode）](https://leetcode.cn/problems/implement-queue-using-stacks/)
+
+```java
+class MyQueue {
+
+	private Deque<Integer> inStack;
+	private Deque<Integer> outStack;
+
+	public MyQueue() {
+		inStack = new ArrayDeque<>();
+		outStack = new ArrayDeque<>();
+	}
+
+	// 入队
+	public void push(int x) {
+		inStack.push(x);
+	}
+
+	// 弹出
+	public int pop() {
+		if (outStack.isEmpty()) {
+			while (!inStack.isEmpty()) {
+				outStack.push(inStack.pop());
+			}
+		}
+		return outStack.pop();
+	}
+
+	// 队头元素
+	public int peek() {
+		if (outStack.isEmpty()) {
+			while (!inStack.isEmpty()) {
+				outStack.push(inStack.pop());
+			}
+		}
+		return outStack.peek();
+	}
+
+	// 是否为空
+	public boolean empty() {
+		return inStack.isEmpty() && outStack.isEmpty();
+	}
+}
+
+/**
+ * Your MyQueue object will be instantiated and called as such:
+ * MyQueue obj = new MyQueue();
+ * obj.push(x);
+ * int param_2 = obj.pop();
+ * int param_3 = obj.peek();
+ * boolean param_4 = obj.empty();
+ */
+```
+
+[503. 下一个更大元素 II - 力扣（LeetCode）](https://leetcode.cn/problems/next-greater-element-ii/)
+
+```java
+public int[] nextGreaterElements(int[] nums) {
+        int n = nums.length;
+		int[] res = new int[n];
+		Arrays.fill(res, -1);
+		Deque<Integer> stack = new LinkedList<>();
+		for (int i = 0; i < n * 2; i++) {
+			int num = nums[i % n];
+			while (!stack.isEmpty() && nums[stack.peek()] < num) {
+				res[stack.pop()] = num;
+			}
+			if (i < n) {
+				stack.push(i);
+			}
+		}
+		return res;
+    }
+```
+
+[739. 每日温度 - 力扣（LeetCode）](https://leetcode.cn/problems/daily-temperatures/)
+
+```java
+public int[] dailyTemperatures(int[] temperatures) {
+        Stack<Integer> stack = new Stack<>();
+        int len = temperatures.length;
+        int[] ans = new int[len];
+        for (int i = 0; i < len; i++) {
+            while (!stack.isEmpty() && temperatures[i] > temperatures[stack.peek()]) {
+                int temp = stack.pop();
+                ans[temp] = i - temp;
+            }
+            stack.add(i);
+        }
+        return ans;
+    }
+```
+
+[面试题 03.02. 栈的最小值 - 力扣（LeetCode）](https://leetcode.cn/problems/min-stack-lcci/)
+
+```java
+class MinStack {
+
+    Deque<Integer> xStack;
+	Deque<Integer> minStack;
+
+	/** initialize your data structure here. */
+	public MinStack() {
+		xStack = new LinkedList<>();
+		minStack = new LinkedList<>();
+		minStack.push(Integer.MAX_VALUE);
+	}
+
+	public void push(int x) {
+		xStack.push(x);
+		 minStack.push(Math.min(minStack.peek(), x));
+	}
+
+	public void pop() {
+		xStack.pop();
+        minStack.pop();
+	}
+
+	public int top() {
+		return xStack.peek();
+	}
+
+	public int getMin() {
+		return minStack.peek();
+	}
+}
+
+/**
+ * Your MinStack object will be instantiated and called as such:
+ * MinStack obj = new MinStack();
+ * obj.push(x);
+ * obj.pop();
+ * int param_3 = obj.top();
+ * int param_4 = obj.getMin();
+ */
+```
+
