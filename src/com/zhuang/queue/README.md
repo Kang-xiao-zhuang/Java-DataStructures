@@ -576,3 +576,32 @@ class Solution {
 }
 ```
 
+[2073. 买票需要的时间 - 力扣（LeetCode）](https://leetcode.cn/problems/time-needed-to-buy-tickets/)
+
+```java
+class Solution {
+    public int timeRequiredToBuy(int[] tickets, int k) {
+		int index = 0;
+		int second = 0;
+		if (tickets.length == 1) {
+			return tickets[0];
+		}
+		// 模拟购票
+		while (tickets[k] != 0) {
+			// 去除已经完成购票的人
+			if (tickets[index] > 0) {
+				tickets[index]--;
+				// 时间增加
+				second++;
+			}
+			index++;
+			if (index == tickets.length) {
+				// 开始下一轮购票
+				index = 0;
+			}
+		}
+		return second;
+	}
+}
+```
+
