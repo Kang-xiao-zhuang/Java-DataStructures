@@ -78,7 +78,7 @@ public class MyStack<E> implements Deque<E> {
 		myStack.stackArray = null;
 		return true;
 	}
-
+	
 	@Override
 	public String toString() {
 		return Arrays.toString(stackArray);
