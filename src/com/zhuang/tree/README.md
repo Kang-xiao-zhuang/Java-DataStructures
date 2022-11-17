@@ -465,3 +465,197 @@ BST（尤其是像AVL Tree这样平衡的BST）是实现某种**表**（或**映
 - 所有叶子结点都是黑色
 - 如果节点是红色的，则它的子节点必须是黑色的（反之倒不一定必须为真）
 - 从根到叶节点或空子节点的每条路径，必须包含相同数目的黑色节点
+
+**用法最广:**
+
+- Java ConcurrentHashMap & TreeMap
+- C++ STL: map & set
+- linux进程调度Completely Fair Scheduler,用红黑树管理进程控制块
+- epoll在内核中的实现，用红黑树管理事件块
+- nginx中，用红黑树管理timer等
+
+
+
+## 左旋操作
+
+**左旋：**以某个节点作为支点(旋转节点)，其右子节点变为旋转节点的父节点，右子节点的左子节点变为旋转节点的右子节点，旋转节点的左子节点保持不变。右子节点的左子节点相当于从右子节点上“断开”，重新连接到旋转节点上。
+
+
+
+**左旋**只影响旋转结点和其**右子树**的结构，把右子树的结点往左子树挪了。
+
+
+
+
+
+
+
+![在这里插入图片描述](https://img-blog.csdnimg.cn/abe05d35f9cb427d98df27caabe7bfed.png)
+
+**左旋后**
+
+![在这里插入图片描述](https://img-blog.csdnimg.cn/0a451bcfbc774464a955b1482107e8d9.png)
+
+**变色后**
+
+![在这里插入图片描述](https://img-blog.csdnimg.cn/fe006272e29e411895035db4cfb20f2b.png)
+
+****
+
+**更复杂的左旋**
+
+![在这里插入图片描述](https://img-blog.csdnimg.cn/c1466848de8343148fbf74e8d5c5286b.png)
+
+**左旋后**
+
+![在这里插入图片描述](https://img-blog.csdnimg.cn/4aaf47fd414a4cc4bd2bbae6d8629d03.png)
+
+**变色后**
+
+![在这里插入图片描述](https://img-blog.csdnimg.cn/68abe4077c374c2189af76680dea9b5c.png)
+
+### 左旋的条件是什么？
+
+- 旋转节点的右路出现两个连续的红色节点。
+- 旋转节点的右子节点不为空。（如果右子节点为空，左旋后，根节点就变成空了。）
+
+### 左旋的具体步骤
+
+- 获取当前结点h
+- 获取当前结点h的右子结点x
+- 让h的右子结点指向x的左子结点
+- 让x的左子结点指向h结点
+
+![在这里插入图片描述](https://img-blog.csdnimg.cn/d697ce9be2cd4b28b334932d3709a662.png)
+
+```java
+// 左旋操作
+	private void rotateLeft(Node h) {
+		// 判断当前节点h是否为null
+		if (h != null) {
+			// 获取当前节点h的右子节点x
+			Node x = h.right;
+			// 让h的右子节点指向x的左子节点
+			h.right = x.left;
+			// 判断x的左子节点是否为null
+			if (x.left != null) {
+				// 让x的左子节点的父节点指向h
+				x.left.parent = h;
+			}
+			// 让x的父节点指向h的父节点
+			x.parent = h.parent;
+			// 判断h的父节点是否为null
+			if (h.parent == null) {
+				// 说明是根节点
+				root = x;
+			} else if (h.parent.left == h) { // 判断当前h子树是否为父节点的右子树
+				h.parent.left = x;
+			} else { // 判断当前h子树是否为父节点的右子树
+				h.parent.right = x;
+			}
+			// x左子节点指向h节点
+			x.left = h;
+			// h节点的父节点指向x节点
+			h.parent = x;
+		}
+	}
+```
+
+## 右旋操作
+
+**右旋**：以某个结点作为支点(旋转结点)，其左子结点变为旋转结点的父结点，左子结点的右子结点变为旋转结点的左子结点，右子结点保持不变。
+
+
+
+**右旋**只影响旋转结点和其**左子树**的结构，把左子树的结点往右子树挪了。
+
+#### （一）选转节点为插入节点的爷爷节点
+
+**旋转节点为根节点**
+
+![在这里插入图片描述](https://img-blog.csdnimg.cn/12e38da777da42bc96e41136408578fd.png)
+
+**根节点右旋后**
+
+
+
+![在这里插入图片描述](https://img-blog.csdnimg.cn/3e4ed095b4904502b20e0f34733a4498.png)
+
+
+
+**变色后**
+
+![在这里插入图片描述](https://img-blog.csdnimg.cn/6add95c8b56046fe846ecff070c61416.png)
+
+
+
+#### （二）旋转节点是插入节点的父节点：
+
+**插入节点7，旋转节点8**
+
+![在这里插入图片描述](https://img-blog.csdnimg.cn/c50746bae2f547f5a509ce125f8f7613.png)
+
+**8右旋后**
+
+![在这里插入图片描述](https://img-blog.csdnimg.cn/bb1544ea4eda49e19d0733af58465905.png)
+
+**根节点5左旋后**
+
+![在这里插入图片描述](https://img-blog.csdnimg.cn/8839a48233774b6bb7994a49037cb558.png)
+
+**变色后**
+
+![在这里插入图片描述](https://img-blog.csdnimg.cn/4139a28e0d524d04897ccf024765bd80.png)
+
+### 右旋的条件是什么？
+
+- 左子节点不为空。
+- 旋转节点的左路，存在两个相连的红色节点。
+
+### 右旋的具体步骤
+
+- 获取当前结点h
+- 获取当前结点h的左子结点x
+- 让h的左子结点指向x的右子结点
+- 让x的右子结点指向h结点
+
+![在这里插入图片描述](https://img-blog.csdnimg.cn/73d3d12e455a48f5892f76122394a1a3.png)
+
+```java
+	// 右旋操作
+	private void rotateRight(Node h) {
+		// 判断当前节点h是否为null
+		if (h != null) {
+			// 获取当前节点h的左子节点x
+			Node x = h.left;
+			// 让h的左子节点指向x的右子节点
+			h.left = x.right;
+			// 判断x的右子节点是否为null
+			if (x.right != null) {
+				// 让x的右子节点的父节点指向h
+				x.right.parent = h;
+			}
+			// 让x的父节点指向h的父节点
+			x.parent = h.parent;
+			// 判断h的父节点是否为null
+			if (h.parent == null) {
+				// 说明是根节点
+				root = x;
+			} else if (h.parent.right == h) { // 判断当前h子树是否为父节点的右子树
+				// 如果是，修正为新的x子树
+				h.parent.right = x;
+			} else { // 判断当前h子树是否为父节点的左子树
+				// 如果是，修正为新的x子树
+				h.parent.left = x;
+			}
+			// x左子节点指向h节点
+			x.left = h;
+			// h节点的父节点指向x节点
+			h.parent = x;
+		}
+```
+
+### 变色操作
+
+- 红色变为黑色。
+- 黑色变为红色。
