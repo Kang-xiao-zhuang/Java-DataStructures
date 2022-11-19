@@ -669,51 +669,51 @@ BST（尤其是像AVL Tree这样平衡的BST）是实现某种**表**（或**映
 ### 获取指定结点
 
 ```java
-	// 获取指定节点
-	public Node getNode(Key key) {
-		Node temp = root;
-		while (temp != null) {
-			int cmp = key.compareTo(temp.key);
-			if (cmp < 0) {
-				temp = temp.left;
-			} else if (cmp > 0) {
-				temp = temp.right;
-			} else {
-				return temp;
-			}
+// 获取指定节点
+public Node getNode(Key key) {
+	Node temp = root;
+	while (temp != null) {
+		int cmp = key.compareTo(temp.key);
+		if (cmp < 0) {
+			temp = temp.left;
+		} else if (cmp > 0) {
+			temp = temp.right;
+		} else {
+			return temp;
 		}
-		return null;
 	}
+	return null;
+}
 ```
 
 ### 获取最小结点
 
 ```java
-	// 获取最小节点
-	public Node getMinNode() {
-		Node temp = root;
-		if (temp != null) {
-			while (temp.left != null) {
-				temp = temp.left;
-			}
+// 获取最小节点
+public Node getMinNode() {
+	Node temp = root;
+	if (temp != null) {
+		while (temp.left != null) {
+			temp = temp.left;
 		}
-		return temp;
 	}
+	return temp;
+}
 ```
 
 ### 获取最大结点
 
 ```java
-	// 获取最大节点
-	public Node getMaxNode() {
-		Node temp = root;
-		if (temp != null) {
-			while (temp.right != null) {
-				temp = temp.right;
-			}
+// 获取最大节点
+public Node getMaxNode() {
+	Node temp = root;
+	if (temp != null) {
+		while (temp.right != null) {
+			temp = temp.right;
 		}
-		return temp;
 	}
+	return temp;
+}
 ```
 
 ### 获取前驱结点
@@ -735,26 +735,26 @@ BST（尤其是像AVL Tree这样平衡的BST）是实现某种**表**（或**映
 第三种情况：要查询的结点不为null，并且左子树为null，我们就需要循环向上查询其父结点，直到当前结点是父结点的右子结点为止。如上图所示：结点5的前驱结点是结点4，操作顺序：首先结点5是结点6的左子结点，结点6是结点8的左子结点，结点8是结点4的右子结点，此时停止，结点4就是前驱结点。
 
 ```java
-	// 获取指定节点的前驱节点
-	public Node predecessor(Node node) {
-		if (node == null) {
-			return null;
-		} else if (node.left != null) {
-			Node temp = node.left;
-			while (temp.right != null) {
+// 获取指定节点的前驱节点
+public Node predecessor(Node node) {
+	if (node == null) {
+		return null;
+	} else if (node.left != null) {
+		Node temp = node.left;
+		while (temp.right != null) {
 				temp = temp.right;
-			}
-			return temp;
-		} else {
-			Node temp = node.parent;
-			Node x = node;
-			while (temp != null && x == temp.left) {
-				x = temp;
-				temp = temp.parent;
-			}
-			return temp;
 		}
+		return temp;
+	} else {
+		Node temp = node.parent;
+		Node x = node;
+		while (temp != null && x == temp.left) {
+			x = temp;
+			temp = temp.parent;
+		}
+		return temp;
 	}
+}
 ```
 
 ### 获取后继结点
@@ -777,25 +777,25 @@ BST（尤其是像AVL Tree这样平衡的BST）是实现某种**表**（或**映
 
 
 ```java
-	// 获取指定节点的后驱节点
-	public Node successor(Node node) {
-		if (node == null) {
-			return null;
-		} else if (node.right != null) {
-			Node temp = node.right;
-			while (temp.left != null) {
-				temp = temp.left;
-			}
-			return temp;
-		} else {
-			Node temp = node.parent;
-			Node x = node;
-			while (temp != null && x == temp.right) {
-				x = temp;
-				temp = temp.parent;
-			}
-			return temp;
+// 获取指定节点的后驱节点
+public Node successor(Node node) {
+	if (node == null) {
+		return null;
+	} else if (node.right != null) {
+		Node temp = node.right;
+		while (temp.left != null) {
+			temp = temp.left;
 		}
+		return temp;
+	} else {
+		Node temp = node.parent;
+		Node x = node;
+		while (temp != null && x == temp.right) {
+			x = temp;
+			temp = temp.parent;
+		}
+		return temp;
 	}
+}
 ```
 
