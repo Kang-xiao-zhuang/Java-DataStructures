@@ -1,5 +1,8 @@
 package com.zhuang.tree.rbt;
 
+import java.util.LinkedList;
+import java.util.Queue;
+
 public class RedBlackTree<Key extends Comparable<Key>, Value> {
 
 	// 根结点
@@ -58,31 +61,31 @@ public class RedBlackTree<Key extends Comparable<Key>, Value> {
 		// 判断当前节点h是否为null
 		if (h != null) {
 			// 获取当前节点h的右子节点x
-			Node x = h.right;
+			Node newNode = h.right;
 			// 让h的右子节点指向x的左子节点
-			h.right = x.left;
+			h.right = newNode.left;
 			// 判断x的左子节点是否为null
-			if (x.left != null) {
+			if (newNode.left != null) {
 				// 让x的左子节点的父节点指向h
-				x.left.parent = h;
+				newNode.left.parent = h;
 			}
 			// 让x的父节点指向h的父节点
-			x.parent = h.parent;
+			newNode.parent = h.parent;
 			// 判断h的父节点是否为null
 			if (h.parent == null) {
 				// 说明是根节点
-				root = x;
+				root = newNode;
 			} else if (h.parent.left == h) { // 判断当前h子树是否为父节点的左子树
 				// 如果是，修正为新的x子树
-				h.parent.left = x;
+				h.parent.left = newNode;
 			} else { // 判断当前h子树是否为父节点的右子树
 				// 如果是，修正为新的x子树
-				h.parent.right = x;
+				h.parent.right = newNode;
 			}
 			// x左子节点指向h节点
-			x.left = h;
+			newNode.left = h;
 			// h节点的父节点指向x节点
-			h.parent = x;
+			h.parent = newNode;
 		}
 	}
 
@@ -91,31 +94,219 @@ public class RedBlackTree<Key extends Comparable<Key>, Value> {
 		// 判断当前节点h是否为null
 		if (h != null) {
 			// 获取当前节点h的左子节点x
-			Node x = h.left;
+			Node newNode = h.left;
 			// 让h的左子节点指向x的右子节点
-			h.left = x.right;
+			h.left = newNode.right;
 			// 判断x的右子节点是否为null
-			if (x.right != null) {
+			if (newNode.right != null) {
 				// 让x的右子节点的父节点指向h
-				x.right.parent = h;
+				newNode.right.parent = h;
 			}
 			// 让x的父节点指向h的父节点
-			x.parent = h.parent;
+			newNode.parent = h.parent;
 			// 判断h的父节点是否为null
 			if (h.parent == null) {
 				// 说明是根节点
-				root = x;
+				root = newNode;
 			} else if (h.parent.right == h) { // 判断当前h子树是否为父节点的右子树
 				// 如果是，修正为新的x子树
-				h.parent.right = x;
+				h.parent.right = newNode;
 			} else { // 判断当前h子树是否为父节点的左子树
 				// 如果是，修正为新的x子树
-				h.parent.left = x;
+				h.parent.left = newNode;
 			}
 			// x左子节点指向h节点
-			x.left = h;
+			newNode.left = h;
 			// h节点的父节点指向x节点
-			h.parent = x;
+			h.parent = newNode;
+		}
+	}
+
+	public void put(Key key, Value value) {
+		// 获取根节点
+		Node temp = root;
+		if (temp == null) {
+			root = new Node(key, value);
+			// 根肯定是黑色
+			root.color = BLACK;
+			size++;
+			return;
+		}
+		Node parent;
+		int cmp;
+		do {
+			parent = temp;
+			cmp = key.compareTo(temp.key);
+			if (cmp < 0) {
+				temp = temp.left;
+			} else if (cmp > 0) {
+				temp = temp.right;
+			} else {
+				temp.value = value;
+			}
+		} while (temp != null);
+
+		// 添加新的节点
+		Node newNode = new Node(key, value);
+		newNode.parent = parent;
+		if (cmp < 0) {
+			parent.left = newNode;
+		} else {
+			parent.right = newNode;
+		}
+		// 添加后修正
+		fixAfterPut(newNode);
+
+		size++;
+	}
+
+	private void fixAfterPut(RedBlackTree<Key, Value>.Node newNode) {
+		// 添加的节点必须是红色
+		newNode.color = RED;
+		// 因为root没有父节点，所以不能让newNode上移循环到root
+		while (newNode != null && newNode != root && newNode.parent.color == RED) {
+			RedBlackTree<Key, Value>.Node grandpa = parentOf(parentOf(newNode));
+			if (parentOf(newNode) == leftOf(grandpa)) {
+				Node uncle = rightOf(grandpa);
+				if (colorOf(uncle) == RED) {
+					setColor(parentOf(newNode), BLACK);
+					setColor(uncle, BLACK);
+					setColor(grandpa, RED);
+					newNode = grandpa;
+				} else {
+					if (newNode == rightOf(parentOf(newNode))) {
+						newNode = parentOf(newNode);
+						rotateLeft(newNode);
+					}
+					setColor(parentOf(newNode), BLACK);
+					setColor(grandpa, RED);
+					rotateRight(grandpa);
+				}
+			} else {
+				Node uncle = leftOf(grandpa);
+				if (colorOf(uncle) == RED) {
+					setColor(parentOf(newNode), BLACK);
+					setColor(uncle, BLACK);
+					setColor(grandpa, RED);
+					newNode = grandpa;
+				} else {
+					if (newNode == leftOf(parentOf(newNode))) {
+						newNode = parentOf(newNode);
+						rotateRight(newNode);
+					}
+					setColor(parentOf(newNode), BLACK);
+					setColor(grandpa, RED);
+					rotateLeft(grandpa);
+				}
+			}
+		}
+		root.color = BLACK;// 根结点必须是黑结点
+	}
+
+	// 层序遍历当前树
+	public void layerErgodic() {
+		layerErgodic(root);
+	}
+
+	// 层序遍历指定树
+	private void layerErgodic(Node x) {
+		// 创建一个队列
+		Queue<Node> queue = new LinkedList<>();
+		// 加入指定结点
+		queue.offer(x);
+		// 循环弹出遍历
+		while (!queue.isEmpty()) {
+			// 从队列中弹出一个结点，输出当前结点的信息
+			Node n = queue.poll();
+			System.out.println(n);
+			// 判断当前结点还有没有左子结点，如果有，则放入到nodes中
+			if (n.left != null) {
+				queue.offer(n.left);
+			}
+			// 判断当前结点还有没有右子结点，如果有，则放入到nodes中
+			if (n.right != null) {
+				queue.offer(n.right);
+			}
+		}
+	}
+
+	// 获取指定节点
+	public Node getNode(Key key) {
+		Node temp = root;
+		while (temp != null) {
+			int cmp = key.compareTo(temp.key);
+			if (cmp < 0) {
+				temp = temp.left;
+			} else if (cmp > 0) {
+				temp = temp.right;
+			} else {
+				return temp;
+			}
+		}
+		return null;
+	}
+
+	// 获取最小节点
+	public Node getMinNode() {
+		Node temp = root;
+		if (temp != null) {
+			while (temp.left != null) {
+				temp = temp.left;
+			}
+		}
+		return temp;
+	}
+
+	// 获取最大节点
+	public Node getMaxNode() {
+		Node temp = root;
+		if (temp != null) {
+			while (temp.right != null) {
+				temp = temp.right;
+			}
+		}
+		return temp;
+	}
+
+	// 获取指定节点的前驱节点
+	public Node predecessor(Node node) {
+		if (node == null) {
+			return null;
+		} else if (node.left != null) {
+			Node temp = node.left;
+			while (temp.right != null) {
+				temp = temp.right;
+			}
+			return temp;
+		} else {
+			Node temp = node.parent;
+			Node x = node;
+			while (temp != null && x == temp.left) {
+				x = temp;
+				temp = temp.parent;
+			}
+			return temp;
+		}
+	}
+
+	// 获取指定节点的后驱节点
+	public Node successor(Node node) {
+		if (node == null) {
+			return null;
+		} else if (node.right != null) {
+			Node temp = node.right;
+			while (temp.left != null) {
+				temp = temp.left;
+			}
+			return temp;
+		} else {
+			Node temp = node.parent;
+			Node x = node;
+			while (temp != null && x == temp.right) {
+				x = temp;
+				temp = temp.parent;
+			}
+			return temp;
 		}
 	}
 
