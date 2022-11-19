@@ -659,3 +659,143 @@ BST（尤其是像AVL Tree这样平衡的BST）是实现某种**表**（或**映
 
 - 红色变为黑色。
 - 黑色变为红色。
+
+### 添加操作
+
+参考文章：[数据结构：树基础_轻松的小希的博客-CSDN博客](https://caochenlei.blog.csdn.net/article/details/115079406)
+
+## RBT的获取
+
+### 获取指定结点
+
+```java
+	// 获取指定节点
+	public Node getNode(Key key) {
+		Node temp = root;
+		while (temp != null) {
+			int cmp = key.compareTo(temp.key);
+			if (cmp < 0) {
+				temp = temp.left;
+			} else if (cmp > 0) {
+				temp = temp.right;
+			} else {
+				return temp;
+			}
+		}
+		return null;
+	}
+```
+
+### 获取最小结点
+
+```java
+	// 获取最小节点
+	public Node getMinNode() {
+		Node temp = root;
+		if (temp != null) {
+			while (temp.left != null) {
+				temp = temp.left;
+			}
+		}
+		return temp;
+	}
+```
+
+### 获取最大结点
+
+```java
+	// 获取最大节点
+	public Node getMaxNode() {
+		Node temp = root;
+		if (temp != null) {
+			while (temp.right != null) {
+				temp = temp.right;
+			}
+		}
+		return temp;
+	}
+```
+
+### 获取前驱结点
+
+![在这里插入图片描述](https://img-blog.csdnimg.cn/a2f279bc356249069b3309c58afb7456.png)
+
+前驱结点： 小于当前结点的最大值，在一棵树中，判断前驱结点分为三种情况。
+
+
+
+第一种情况：要查询的结点为null，此时直接返回null。
+
+
+
+第二种情况：要查询的结点不为null，并且左子树不为null，在其左子树中找到最大的那个结点即可。如上图所示：结点4的前驱结点是结点3。
+
+
+
+第三种情况：要查询的结点不为null，并且左子树为null，我们就需要循环向上查询其父结点，直到当前结点是父结点的右子结点为止。如上图所示：结点5的前驱结点是结点4，操作顺序：首先结点5是结点6的左子结点，结点6是结点8的左子结点，结点8是结点4的右子结点，此时停止，结点4就是前驱结点。
+
+```java
+	// 获取指定节点的前驱节点
+	public Node predecessor(Node node) {
+		if (node == null) {
+			return null;
+		} else if (node.left != null) {
+			Node temp = node.left;
+			while (temp.right != null) {
+				temp = temp.right;
+			}
+			return temp;
+		} else {
+			Node temp = node.parent;
+			Node x = node;
+			while (temp != null && x == temp.left) {
+				x = temp;
+				temp = temp.parent;
+			}
+			return temp;
+		}
+	}
+```
+
+### 获取后继结点
+
+![在这里插入图片描述](https://img-blog.csdnimg.cn/a2f279bc356249069b3309c58afb7456.png)
+
+后继结点： 大于当前结点的最小值，在一棵树中，判断后继结点分为三种情况。
+
+
+
+第一种情况：要查询的结点为null，此时直接返回null。
+
+
+
+第二种情况：要查询的结点不为null，并且右子树不为null，在其右子树中找到最小的那个结点即可。如上图所示：结点4的后继结点是结点5。
+
+
+
+第三种情况：要查询的结点不为null，并且右子树为null，我们就需要循环向上查询其父结点，直到当前结点是父结点的左子结点为止。如上图所示：结点3的后继结点是结点4，操作顺序：首先结点3是结点2的右子结点，结点2是结点4的左子结点，此时停止，结点4就是后继结点。
+
+
+```java
+	// 获取指定节点的后驱节点
+	public Node successor(Node node) {
+		if (node == null) {
+			return null;
+		} else if (node.right != null) {
+			Node temp = node.right;
+			while (temp.left != null) {
+				temp = temp.left;
+			}
+			return temp;
+		} else {
+			Node temp = node.parent;
+			Node x = node;
+			while (temp != null && x == temp.right) {
+				x = temp;
+				temp = temp.parent;
+			}
+			return temp;
+		}
+	}
+```
+
