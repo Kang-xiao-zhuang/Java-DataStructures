@@ -530,35 +530,35 @@ BST（尤其是像AVL Tree这样平衡的BST）是实现某种**表**（或**映
 
 ```java
 // 左旋操作
-	private void rotateLeft(Node h) {
-		// 判断当前节点h是否为null
-		if (h != null) {
-			// 获取当前节点h的右子节点x
-			Node x = h.right;
-			// 让h的右子节点指向x的左子节点
-			h.right = x.left;
-			// 判断x的左子节点是否为null
-			if (x.left != null) {
-				// 让x的左子节点的父节点指向h
-				x.left.parent = h;
-			}
-			// 让x的父节点指向h的父节点
-			x.parent = h.parent;
-			// 判断h的父节点是否为null
-			if (h.parent == null) {
-				// 说明是根节点
-				root = x;
-			} else if (h.parent.left == h) { // 判断当前h子树是否为父节点的右子树
-				h.parent.left = x;
-			} else { // 判断当前h子树是否为父节点的右子树
-				h.parent.right = x;
-			}
-			// x左子节点指向h节点
-			x.left = h;
-			// h节点的父节点指向x节点
-			h.parent = x;
+private void rotateLeft(Node h) {
+	// 判断当前节点h是否为null
+	if (h != null) {
+		// 获取当前节点h的右子节点x
+		Node x = h.right;
+		// 让h的右子节点指向x的左子节点
+		h.right = x.left;
+		// 判断x的左子节点是否为null
+		if (x.left != null) {
+			// 让x的左子节点的父节点指向h
+			x.left.parent = h;
 		}
+		// 让x的父节点指向h的父节点
+		x.parent = h.parent;
+		// 判断h的父节点是否为null
+		if (h.parent == null) {
+			// 说明是根节点
+			root = x;
+		} else if (h.parent.left == h) { // 判断当前h子树是否为父节点的右子树
+			h.parent.left = x;
+		} else { // 判断当前h子树是否为父节点的右子树
+			h.parent.right = x;
+		}
+		// x左子节点指向h节点
+		x.left = h;
+		// h节点的父节点指向x节点
+		h.parent = x;
 	}
+}
 ```
 
 ## 右旋操作
@@ -622,37 +622,37 @@ BST（尤其是像AVL Tree这样平衡的BST）是实现某种**表**（或**映
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/73d3d12e455a48f5892f76122394a1a3.png)
 
 ```java
-	// 右旋操作
-	private void rotateRight(Node h) {
-		// 判断当前节点h是否为null
-		if (h != null) {
-			// 获取当前节点h的左子节点x
-			Node x = h.left;
-			// 让h的左子节点指向x的右子节点
-			h.left = x.right;
-			// 判断x的右子节点是否为null
-			if (x.right != null) {
-				// 让x的右子节点的父节点指向h
-				x.right.parent = h;
-			}
-			// 让x的父节点指向h的父节点
-			x.parent = h.parent;
-			// 判断h的父节点是否为null
-			if (h.parent == null) {
-				// 说明是根节点
-				root = x;
-			} else if (h.parent.right == h) { // 判断当前h子树是否为父节点的右子树
-				// 如果是，修正为新的x子树
-				h.parent.right = x;
-			} else { // 判断当前h子树是否为父节点的左子树
-				// 如果是，修正为新的x子树
-				h.parent.left = x;
-			}
-			// x左子节点指向h节点
-			x.left = h;
-			// h节点的父节点指向x节点
-			h.parent = x;
+// 右旋操作
+private void rotateRight(Node h) {
+	// 判断当前节点h是否为null
+	if (h != null) {
+		// 获取当前节点h的左子节点x
+		Node x = h.left;
+		// 让h的左子节点指向x的右子节点
+		h.left = x.right;
+		// 判断x的右子节点是否为null
+		if (x.right != null) {
+			// 让x的右子节点的父节点指向h
+			x.right.parent = h;
 		}
+		// 让x的父节点指向h的父节点
+		x.parent = h.parent;
+		// 判断h的父节点是否为null
+		if (h.parent == null) {
+			// 说明是根节点
+			root = x;
+		} else if (h.parent.right == h) { // 判断当前h子树是否为父节点的右子树
+			// 如果是，修正为新的x子树
+			h.parent.right = x;
+		} else { // 判断当前h子树是否为父节点的左子树
+			// 如果是，修正为新的x子树
+			h.parent.left = x;
+		}
+		// x左子节点指向h节点
+		x.left = h;
+		// h节点的父节点指向x节点
+		h.parent = x;
+	}
 ```
 
 ### 变色操作
@@ -799,3 +799,102 @@ public Node successor(Node node) {
 }
 ```
 
+## RBT的删除
+
+### 删除操作
+
+关于红黑树的删除操作，这时候你不能使用BST的那种递归删除，因为我们当前的红黑树的结点有父结点指向，这点比较麻烦，具体删除规则一共分为4种：
+
+
+
+1、要删除的结点是叶子结点，此时直接删除即可。（叶子结点可黑可红，由于RBT是黑色平衡，如果删除的是黑色结点，我们要先调整，然后再删除）
+
+
+
+2、要删除的结点是树根结点，此时直接删除即可。（树根结点永远黑色，删除完了就完了，树就空了，还保持啥平衡）
+
+
+
+3、要删除的结点有1个孩子，可能有左孩子，可能有右孩子，只需让左 / 右孩子指向 要删除结点 的父亲结点即可。
+
+
+
+4、要删除的结点有2个孩子，肯定有左孩子，肯定有右孩子，只需让该结点的前驱或后继结点的值覆盖 要删除结点 的值，然后删除前驱或后继结点即可。
+
+如下图所示：4的前驱结点是3.5、6的后继结点是6.5，此时的问题就变成了第1种的删除规则了；5的前驱结点是4、5的后继结点是6，这两种情况都有1个孩子，此时的问题就变成了第3种的删除规则了。
+
+![在这里插入图片描述](https://img-blog.csdnimg.cn/ccd4ef23ffc14dc78776a8cca8422cfc.png)
+
+因此，我们在进行删除操作的时候，首先从第4种规则开始判断，第4种规则虽然要删除前驱或者后继结点，但是因为和第3种情况和第1种情况重复，所以，删除的动作全部交给第3种情况和第1种情况来处理，又因为，第1、2种情况比较固定，所以，我们的处理顺序是：处理第4种、处理第3种、处理第2种、处理第1种。
+
+
+
+当然了，在第3种中，如果删除的时候也是黑结点，那么删除后也是需要修正的，以此来保持红黑树的平衡。
+
+```java
+// 删除操作
+	public Value delete(Key key) {
+		Node p = getNode(key);
+		if (p == null)
+			return null;
+		Value oldValue = p.value;
+		deleteNode(p);
+		return oldValue;
+	}
+
+	// 真正删除
+	private void deleteNode(Node node) {
+		size--;
+		// 4. 删除的节点有2个孩子，肯定有左孩子，肯定有右孩子
+		if (node.left != null && node.right != null) {
+			// 找到前驱节点，然后替换要删除的节点的键值
+			Node prev = predecessor(node);
+			node.key = prev.key;
+			node.value = prev.value;
+			node = prev;
+		}
+		// 3.要删除的节点有一个孩子，可能有左孩子，可能有右孩子
+		Node replacement = (node.left != null ? node.left : node.right);
+		if (replacement != null) {
+			// 让左右子节点连接到node的父节点
+			replacement.parent = node.parent;
+			if (node.parent == null) {
+				root = replacement;
+			} else if (node == node.parent.left) {
+				node.parent.left = replacement;
+			} else {
+				node.parent.right = replacement;
+			}
+			// 释放当前node节点所有指向等待回收
+			node.left = node.right = node.parent = null;
+			// 如果当前节点是黑色，需要修正
+			if (node.color == BLACK) {
+				fixAfterDelete(replacement);
+			}
+			// 2.要删除的节点是树根节点，此时直接删除即可
+			else if (node.parent == null) {
+				root = null;
+			} else {
+				// 要删除的节点是叶子节点，直接删除(如果删除黑色节点，先调整，然后再删除)
+				if (node.color == BLACK) {
+					fixAfterDelete(node);
+				}
+				// 再删除
+				if (node.parent != null) {
+					if (node == node.parent.left) {
+						node.parent.left = null;
+					} else if (node == node.parent.right) {
+						node.parent.right = null;
+					}
+					node.parent = null;
+				}
+			}
+		}
+	}
+```
+
+
+
+> Q：为什么第1种情况是先调整再删除，而第3种情况是先删除再调整？
+>
+> A：第1种情况删除的是叶子结点，你如果先删除的话，删除完了，你还有办法再调整吗？显然结点都没了，这是无法调整，那为什么第3种可以呢？因为第3种调整的是`replacement`被替换的那个结点。

@@ -310,6 +310,71 @@ public class RedBlackTree<Key extends Comparable<Key>, Value> {
 		}
 	}
 
+	// 删除操作
+	public Value delete(Key key) {
+		Node p = getNode(key);
+		if (p == null)
+			return null;
+		Value oldValue = p.value;
+		deleteNode(p);
+		return oldValue;
+	}
+
+	// 真正删除
+	private void deleteNode(Node node) {
+		size--;
+		// 4. 删除的节点有2个孩子，肯定有左孩子，肯定有右孩子
+		if (node.left != null && node.right != null) {
+			// 找到前驱节点，然后替换要删除的节点的键值
+			Node prev = predecessor(node);
+			node.key = prev.key;
+			node.value = prev.value;
+			node = prev;
+		}
+		// 3.要删除的节点有一个孩子，可能有左孩子，可能有右孩子
+		Node replacement = (node.left != null ? node.left : node.right);
+		if (replacement != null) {
+			// 让左右子节点连接到node的父节点
+			replacement.parent = node.parent;
+			if (node.parent == null) {
+				root = replacement;
+			} else if (node == node.parent.left) {
+				node.parent.left = replacement;
+			} else {
+				node.parent.right = replacement;
+			}
+			// 释放当前node节点所有指向等待回收
+			node.left = node.right = node.parent = null;
+			// 如果当前节点是黑色，需要修正
+			if (node.color == BLACK) {
+				fixAfterDelete(replacement);
+			}
+			// 2.要删除的节点是树根节点，此时直接删除即可
+			else if (node.parent == null) {
+				root = null;
+			} else {
+				// 要删除的节点是叶子节点，直接删除(如果删除黑色节点，先调整，然后再删除)
+				if (node.color == BLACK) {
+					fixAfterDelete(node);
+				}
+				// 再删除
+				if (node.parent != null) {
+					if (node == node.parent.left) {
+						node.parent.left = null;
+					} else if (node == node.parent.right) {
+						node.parent.right = null;
+					}
+					node.parent = null;
+				}
+			}
+		}
+	}
+
+	private void fixAfterDelete(RedBlackTree<Key, Value>.Node replacement) {
+		// TODO Auto-generated method stub
+
+	}
+
 	// 结点类
 	public class Node {
 		// 存储键
