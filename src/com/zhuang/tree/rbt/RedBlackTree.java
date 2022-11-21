@@ -323,18 +323,21 @@ public class RedBlackTree<Key extends Comparable<Key>, Value> {
 	// 真正删除
 	private void deleteNode(Node node) {
 		size--;
-		// 4. 删除的节点有2个孩子，肯定有左孩子，肯定有右孩子
+
+		// 4、要删除的结点有2个孩子，肯定有左孩子，肯定有右孩子
 		if (node.left != null && node.right != null) {
-			// 找到前驱节点，然后替换要删除的节点的键值
-			Node prev = predecessor(node);
-			node.key = prev.key;
-			node.value = prev.value;
-			node = prev;
+			// 找到前驱结点，然后替换要删除结点的键值
+			Node s = predecessor(node);
+			node.key = s.key;
+			node.value = s.value;
+			// 替换完成以后，指向前驱结点为删除做准备
+			node = s;
 		}
-		// 3.要删除的节点有一个孩子，可能有左孩子，可能有右孩子
+
+		// 3、要删除的结点有1个孩子，可能有左孩子，可能有右孩子
 		Node replacement = (node.left != null ? node.left : node.right);
 		if (replacement != null) {
-			// 让左右子节点连接到node的父节点
+			// 让左右子结点连接到node的父结点上
 			replacement.parent = node.parent;
 			if (node.parent == null) {
 				root = replacement;
@@ -343,36 +346,116 @@ public class RedBlackTree<Key extends Comparable<Key>, Value> {
 			} else {
 				node.parent.right = replacement;
 			}
-			// 释放当前node节点所有指向等待回收
+			// 释放当前node结点所有指向等待回收
 			node.left = node.right = node.parent = null;
-			// 如果当前节点是黑色，需要修正
+
+			// 如果当前删除的是黑结点需修正
 			if (node.color == BLACK) {
 				fixAfterDelete(replacement);
 			}
-			// 2.要删除的节点是树根节点，此时直接删除即可
-			else if (node.parent == null) {
-				root = null;
-			} else {
-				// 要删除的节点是叶子节点，直接删除(如果删除黑色节点，先调整，然后再删除)
-				if (node.color == BLACK) {
-					fixAfterDelete(node);
+		}
+		// 2、要删除的结点是树根结点，此时直接删除即可。（树根结点永远黑色，删除完了就完了，还保持啥平衡）
+		else if (node.parent == null) {
+			root = null;
+		}
+		// 1、要删除的结点是叶子结点，此时直接删除即可。（如果删除的是黑色结点，我们要先调整，然后再删除）
+		else {
+			// 先调整
+			if (node.color == BLACK) {
+				fixAfterDelete(node);
+			}
+			// 再删除
+			if (node.parent != null) {
+				if (node == node.parent.left) {
+					node.parent.left = null;
+				} else if (node == node.parent.right) {
+					node.parent.right = null;
 				}
-				// 再删除
-				if (node.parent != null) {
-					if (node == node.parent.left) {
-						node.parent.left = null;
-					} else if (node == node.parent.right) {
-						node.parent.right = null;
-					}
-					node.parent = null;
-				}
+				node.parent = null;
 			}
 		}
 	}
 
-	private void fixAfterDelete(RedBlackTree<Key, Value>.Node replacement) {
-		// TODO Auto-generated method stub
+	private void fixAfterDelete(Node node) {
+		// 那么在此之前要处理的必定是 node != root && colorOf(node) == BLACK
+		while (node != root && colorOf(node) == BLACK) {
+			// node是左孩子的情况
+			if (node == leftOf(parentOf(node))) {
+				// 获取当前的兄弟结点
+				Node brother = rightOf(parentOf(node));
 
+				// 找到真正的兄弟结点
+				if (colorOf(brother) == RED) {
+					setColor(brother, BLACK);
+					setColor(parentOf(node), RED);
+					rotateLeft(parentOf(node));
+					brother = rightOf(parentOf(node));
+				}
+
+				// 这个兄弟结点帮不了
+				if (colorOf(leftOf(brother)) == BLACK && colorOf(rightOf(brother)) == BLACK) {
+					setColor(brother, RED);
+					node = parentOf(node);
+				}
+				// 这个兄弟结点帮得了
+				else {
+					// 判断当前结构是不是需要调整，找到真正的兄弟结点
+					if (colorOf(rightOf(brother)) == BLACK) {
+						setColor(leftOf(brother), BLACK);
+						setColor(brother, RED);
+						rotateRight(brother);
+						brother = rightOf(parentOf(node));
+					}
+					// 让老父亲去顶替被删除结点，让亲兄弟去顶替老父亲
+					setColor(brother, colorOf(parentOf(node)));
+					setColor(parentOf(node), BLACK);
+					setColor(rightOf(brother), BLACK);
+					rotateLeft(parentOf(node));
+					// 这种情况，调整一次即可，node=root代表跳出当前循环
+					node = root;
+				}
+			}
+			// node是右孩子的情况
+			else {
+				// 获取当前的兄弟结点
+				Node brother = leftOf(parentOf(node));
+
+				// 找到真正的兄弟结点
+				if (colorOf(brother) == RED) {
+					setColor(brother, BLACK);
+					setColor(parentOf(node), RED);
+					rotateRight(parentOf(node));
+					brother = leftOf(parentOf(node));
+				}
+
+				// 这个兄弟结点帮不了
+				if (colorOf(rightOf(brother)) == BLACK && colorOf(leftOf(brother)) == BLACK) {
+					setColor(brother, RED);
+					node = parentOf(node);
+				}
+				// 这个兄弟结点帮得了
+				else {
+					// 判断当前结构是不是需要调整，找到真正的兄弟结点
+					if (colorOf(leftOf(brother)) == BLACK) {
+						setColor(rightOf(brother), BLACK);
+						setColor(brother, RED);
+						rotateLeft(brother);
+						brother = leftOf(parentOf(node));
+					}
+					// 让老父亲去顶替被删除结点，让亲兄弟去顶替老父亲
+					setColor(brother, colorOf(parentOf(node)));
+					setColor(parentOf(node), BLACK);
+					setColor(leftOf(brother), BLACK);
+					rotateRight(parentOf(node));
+					// 这种情况，调整一次即可，node=root代表跳出当前循环
+					node = root;
+				}
+			}
+		}
+
+		// 如果当前结点是红色，那么立即修改为黑色
+		// 还有一种情况就是为了保证根结点root始终是黑色，因为replacement最后有可能成为根结点
+		setColor(node, BLACK);
 	}
 
 	// 结点类

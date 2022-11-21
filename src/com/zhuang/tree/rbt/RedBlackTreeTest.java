@@ -15,6 +15,13 @@ public class RedBlackTreeTest {
 		rbt.put(10, 10);
 		rbt.put(11, 11);
 		rbt.put(12, 12);
+
+		rbt.delete(1);
+		rbt.delete(3);
+		rbt.delete(5);
+		rbt.delete(7);
+		rbt.delete(9);
+		rbt.delete(11);
 		rbt.layerErgodic();
 	}
 }

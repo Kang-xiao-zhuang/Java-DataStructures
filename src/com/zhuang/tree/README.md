@@ -898,3 +898,94 @@ public Node successor(Node node) {
 > Q：为什么第1种情况是先调整再删除，而第3种情况是先删除再调整？
 >
 > A：第1种情况删除的是叶子结点，你如果先删除的话，删除完了，你还有办法再调整吗？显然结点都没了，这是无法调整，那为什么第3种可以呢？因为第3种调整的是`replacement`被替换的那个结点。
+
+### 删除的修正操作
+
+参考博客 ：[数据结构：树基础](https://caochenlei.blog.csdn.net/article/details/115079406)
+
+
+
+```java
+private void fixAfterDelete(Node node) {
+		// 那么在此之前要处理的必定是 node != root && colorOf(node) == BLACK
+		while (node != root && colorOf(node) == BLACK) {
+			// node是左孩子的情况
+			if (node == leftOf(parentOf(node))) {
+				// 获取当前的兄弟结点
+				Node brother = rightOf(parentOf(node));
+
+				// 找到真正的兄弟结点
+				if (colorOf(brother) == RED) {
+					setColor(brother, BLACK);
+					setColor(parentOf(node), RED);
+					rotateLeft(parentOf(node));
+					brother = rightOf(parentOf(node));
+				}
+
+				// 这个兄弟结点帮不了
+				if (colorOf(leftOf(brother)) == BLACK && colorOf(rightOf(brother)) == BLACK) {
+					setColor(brother, RED);
+					node = parentOf(node);
+				}
+				// 这个兄弟结点帮得了
+				else {
+					// 判断当前结构是不是需要调整，找到真正的兄弟结点
+					if (colorOf(rightOf(brother)) == BLACK) {
+						setColor(leftOf(brother), BLACK);
+						setColor(brother, RED);
+						rotateRight(brother);
+						brother = rightOf(parentOf(node));
+					}
+					// 让老父亲去顶替被删除结点，让亲兄弟去顶替老父亲
+					setColor(brother, colorOf(parentOf(node)));
+					setColor(parentOf(node), BLACK);
+					setColor(rightOf(brother), BLACK);
+					rotateLeft(parentOf(node));
+					// 这种情况，调整一次即可，node=root代表跳出当前循环
+					node = root;
+				}
+			}
+			// node是右孩子的情况
+			else {
+				// 获取当前的兄弟结点
+				Node brother = leftOf(parentOf(node));
+
+				// 找到真正的兄弟结点
+				if (colorOf(brother) == RED) {
+					setColor(brother, BLACK);
+					setColor(parentOf(node), RED);
+					rotateRight(parentOf(node));
+					brother = leftOf(parentOf(node));
+				}
+
+				// 这个兄弟结点帮不了
+				if (colorOf(rightOf(brother)) == BLACK && colorOf(leftOf(brother)) == BLACK) {
+					setColor(brother, RED);
+					node = parentOf(node);
+				}
+				// 这个兄弟结点帮得了
+				else {
+					// 判断当前结构是不是需要调整，找到真正的兄弟结点
+					if (colorOf(leftOf(brother)) == BLACK) {
+						setColor(rightOf(brother), BLACK);
+						setColor(brother, RED);
+						rotateLeft(brother);
+						brother = leftOf(parentOf(node));
+					}
+					// 让老父亲去顶替被删除结点，让亲兄弟去顶替老父亲
+					setColor(brother, colorOf(parentOf(node)));
+					setColor(parentOf(node), BLACK);
+					setColor(leftOf(brother), BLACK);
+					rotateRight(parentOf(node));
+					// 这种情况，调整一次即可，node=root代表跳出当前循环
+					node = root;
+				}
+			}
+		}
+
+		// 如果当前结点是红色，那么立即修改为黑色
+		// 还有一种情况就是为了保证根结点root始终是黑色，因为replacement最后有可能成为根结点
+		setColor(node, BLACK);
+}
+```
+
